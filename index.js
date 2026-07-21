@@ -1,12 +1,11 @@
-{
-  "name": "jogo-lux",
-  "version": "1.0.0",
-  "description": "Bot de moderação",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
-  "dependencies": {
-    "discord.js": "^14.21.0"
-  }
-}
+const { Client, GatewayIntentBits } = require("discord.js");
+
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds]
+});
+
+client.once("ready", () => {
+  console.log(`Bot online: ${client.user.tag}`);
+});
+
+client.login(process.env.TOKEN);
