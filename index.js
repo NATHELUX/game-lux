@@ -29,13 +29,17 @@ client.on("messageCreate", (message) => {
 
 🏓 ?ping - Verifica se o bot está online.
 📖 ?ajuda - Mostra esta lista de comandos.
+👋 ?oi - O bot cumprimenta você.
 
 🚧 Em breve:
-👋 ?oi
 🖼️ ?avatar
 🗑️ ?clear
 ℹ️ ?server
     `);
+  }
+
+  if (message.content === "?oi") {
+    message.reply(`👋 Olá, ${message.author.username}! Seja bem-vindo!`);
   }
 });
 
