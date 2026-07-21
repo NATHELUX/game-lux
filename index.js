@@ -21,3 +21,17 @@ client.on("messageCreate", (message) => {
 });
 
 client.login(process.env.TOKEN);
+if (message.content === "?ajuda") {
+  message.reply(`
+📜 **Comandos do Game-lux**
+
+🏓 ?ping - Verifica se o bot está online.
+📖 ?ajuda - Mostra esta lista de comandos.
+
+🚧 Em breve:
+👋 ?oi
+🖼️ ?avatar
+🗑️ ?clear
+ℹ️ ?server
+  `);
+}
