@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits } = require("discord.js");
+const { Client, GatewayIntentBits, PermissionsBitField } = require("discord.js");
 
 const client = new Client({
   intents: [
@@ -12,7 +12,7 @@ client.once("ready", () => {
   console.log(`Bot online: ${client.user.tag}`);
 });
 
-client.on("messageCreate", (message) => {
+client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
   // ?ping
@@ -32,10 +32,10 @@ client.on("messageCreate", (message) => {
 👤 ?userinfo - Mostra informações do usuário.
 🖼️ ?avatar - Mostra seu avatar.
 🎲 ?dado - Rola um dado de 6 lados.
+🗑️ ?clear - Apaga mensagens.
 
 🚧 Em breve:
 🪙 ?caraoucoroa
-🗑️ ?clear
     `);
   }
 
@@ -81,8 +81,29 @@ client.on("messageCreate", (message) => {
   // ?dado
   if (message.content === "?dado") {
     const numero = Math.floor(Math.random() * 6) + 1;
-
     return message.reply(`🎲 Você rolou o dado e caiu no número **${numero}**!`);
+  }
+
+  // ?clear
+  if (message.content.startsWith("?clear")) {
+
+    if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
+      return message.reply("❌ Você não tem permissão para usar este comando.");
+    }
+
+    const args = message.content.split(" ");
+    const quantidade = parseInt(args[1]);
+
+    if (isNaN(quantidade) || quantidade < 1 || quantidade > 100) {
+      return message.reply("❗ Use: `?clear 10` (1 a 100).");
+    }
+
+    await message.channel.bulkDelete(quantidade + 1, true);
+
+    const aviso = await message.channel.send(`🗑️ ${quantidade} mensagens apagadas!`);
+    setTimeout(() => {
+      aviso.delete().catch(() => {});
+    }, 3000);
   }
 });
 
