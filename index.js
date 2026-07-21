@@ -15,14 +15,12 @@ client.once("ready", () => {
 client.on("messageCreate", (message) => {
   if (message.author.bot) return;
 
-  if (message.content === "!ping") {
+  // ?ping
+  if (message.content === "!ping" || message.content === "?ping") {
     return message.reply("🏓 Pong!");
   }
 
-  if (message.content === "?ping") {
-    return message.reply("🏓 Pong!");
-  }
-
+  // ?ajuda
   if (message.content === "?ajuda") {
     return message.reply(`
 📜 **Comandos do Game-lux**
@@ -31,6 +29,7 @@ client.on("messageCreate", (message) => {
 📖 ?ajuda - Mostra esta lista de comandos.
 👋 ?oi - O bot cumprimenta você.
 ℹ️ ?server - Mostra informações do servidor.
+👤 ?userinfo - Mostra informações do usuário.
 
 🚧 Em breve:
 🖼️ ?avatar
@@ -38,10 +37,12 @@ client.on("messageCreate", (message) => {
     `);
   }
 
+  // ?oi
   if (message.content === "?oi") {
     return message.reply(`👋 Olá, ${message.author.username}! Seja bem-vindo!`);
   }
 
+  // ?server
   if (message.content === "?server") {
     return message.reply(`
 ℹ️ **Informações do servidor**
@@ -51,6 +52,19 @@ client.on("messageCreate", (message) => {
 👥 Membros: ${message.guild.memberCount}
 🆔 ID: ${message.guild.id}
 📅 Criado em: ${message.guild.createdAt.toLocaleDateString("pt-BR")}
+    `);
+  }
+
+  // ?userinfo
+  if (message.content === "?userinfo") {
+    return message.reply(`
+👤 **Informações do usuário**
+
+🏷️ Nome: ${message.author.username}
+🆔 ID: ${message.author.id}
+📅 Conta criada em: ${message.author.createdAt.toLocaleDateString("pt-BR")}
+🎭 Cargo mais alto: ${message.member.roles.highest.name}
+📆 Entrou no servidor em: ${message.member.joinedAt.toLocaleDateString("pt-BR")}
     `);
   }
 });
