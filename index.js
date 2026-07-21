@@ -18,7 +18,7 @@ const client = new Client({
 const prefix = "?";
 
 const MOD_ROLE_ID = "1528100949770633297";
-const TICKETS_CATEGORY_ID = "1528604729645731870";
+const TICKETS_CATEGORY_ID = "1528604493371936818";
 
 client.once("ready", () => {
   console.log(`Bot online: ${client.user.tag}`);
