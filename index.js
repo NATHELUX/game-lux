@@ -2,19 +2,23 @@ const {
   Client,
   GatewayIntentBits,
   PermissionsBitField,
-  ChannelType
+  ChannelType,
+  EmbedBuilder
 } = require("discord.js");
 
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMembers
   ]
 });
 
-const TICKET_CATEGORY_ID = "1528604729645731870";
+const prefix = "?";
+
 const MOD_ROLE_ID = "1528100949770633297";
+const TICKETS_CATEGORY_ID = "1528604729645731870";
 
 client.once("ready", () => {
   console.log(`Bot online: ${client.user.tag}`);
@@ -22,164 +26,130 @@ client.once("ready", () => {
 
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
+  if (!message.content.startsWith(prefix)) return;
 
-  // Ping
-  if (message.content === "?ping") {
+  const args = message.content.slice(prefix.length).trim().split(/ +/);
+  const cmd = args.shift().toLowerCase();
+
+  if (cmd === "ping") {
     return message.reply("🏓 Pong!");
   }
 
-  // Ajuda
-  if (message.content === "?ajuda") {
-    return message.reply(`
-📜 **Comandos do Game-lux**
-
-🏓 ?ping - Verifica se o bot está online.
-📖 ?ajuda - Lista de comandos.
-👋 ?oi - Cumprimenta você.
-🌐 ?server - Informações do servidor.
-👤 ?userinfo - Informações do usuário.
-🖼️ ?avatar - Mostra seu avatar.
-🎲 ?dado - Rola um dado.
-🤖 ?botinfo - Informações do bot.
-🗑️ ?clear <quantidade> - Apaga mensagens.
-🎮 ?teste - Cria um ticket para pedir teste.
-`);
-  }
-
-  // Oi
-  if (message.content === "?oi") {
+  if (cmd === "oi") {
     return message.reply(`👋 Olá, ${message.author.username}! Seja bem-vindo!`);
   }
 
-  // Server
-  if (message.content === "?server") {
+  if (cmd === "ajuda") {
     return message.reply(`
-🌐 **Informações do servidor**
+📜 **Comandos**
 
-🏷️ Nome: ${message.guild.name}
-👑 Dono: <@${message.guild.ownerId}>
-👥 Membros: ${message.guild.memberCount}
-🆔 ID: ${message.guild.id}
-📅 Criado em: ${message.guild.createdAt.toLocaleDateString("pt-BR")}
+🏓 ?ping
+👋 ?oi
+🌍 ?server
+👤 ?userinfo
+🖼 ?avatar
+🎲 ?dado
+🤖 ?botinfo
+🗑 ?clear <quantidade>
+🎫 ?teste
 `);
   }
 
-  // Userinfo
-  if (message.content === "?userinfo") {
-    return message.reply(`
-👤 **Informações do usuário**
+  if (cmd === "server") {
+    const embed = new EmbedBuilder()
+      .setTitle("🌍 Informações do servidor")
+      .addFields(
+        { name: "Nome", value: message.guild.name },
+        { name: "Membros", value: `${message.guild.memberCount}` },
+        { name: "ID", value: message.guild.id }
+      );
 
-🏷️ Nome: ${message.author.username}
-🆔 ID: ${message.author.id}
-📅 Conta criada em: ${message.author.createdAt.toLocaleDateString("pt-BR")}
-🎭 Cargo mais alto: ${message.member.roles.highest.name}
-📅 Entrou no servidor em: ${message.member.joinedAt.toLocaleDateString("pt-BR")}
-`);
+    return message.reply({ embeds: [embed] });
   }
 
-  // Avatar
-  if (message.content === "?avatar") {
-    return message.reply({
-      content: `🖼️ Avatar de ${message.author.username}`,
-      files: [message.author.displayAvatarURL({ size: 1024 })]
-    });
+  if (cmd === "userinfo") {
+    const user = message.mentions.users.first() || message.author;
+
+    const embed = new EmbedBuilder()
+      .setTitle("👤 Informações do usuário")
+      .setThumbnail(user.displayAvatarURL())
+      .addFields(
+        { name: "Nome", value: user.username },
+        { name: "ID", value: user.id }
+      );
+
+    return message.reply({ embeds: [embed] });
   }
 
-  // Dado
-  if (message.content === "?dado") {
+  if (cmd === "avatar") {
+    const user = message.mentions.users.first() || message.author;
+    return message.reply(user.displayAvatarURL({ size: 1024 }));
+  }
+
+  if (cmd === "dado") {
     const numero = Math.floor(Math.random() * 6) + 1;
     return message.reply(`🎲 Você rolou o dado e caiu no número **${numero}**!`);
   }
 
-  // Botinfo
-  if (message.content === "?botinfo") {
-    return message.reply(`
-🤖 **Informações do Game-lux**
+  if (cmd === "botinfo") {
+    const embed = new EmbedBuilder()
+      .setTitle("🤖 Informações do bot")
+      .addFields(
+        { name: "Nome", value: client.user.username },
+        { name: "Servidores", value: `${client.guilds.cache.size}` }
+      );
 
-📛 Nome: ${client.user.username}
-🆔 ID: ${client.user.id}
-🏠 Servidores: ${client.guilds.cache.size}
-👥 Usuários: ${client.users.cache.size}
-⚡ Discord.js: v14
-🟢 Status: Online
-`);
+    return message.reply({ embeds: [embed] });
   }
 
-  // Clear
-  if (message.content.startsWith("?clear")) {
+  if (cmd === "clear") {
+    if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages))
+      return message.reply("Sem permissão.");
 
-    if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
-      return message.reply("❌ Você não tem permissão.");
-    }
+    const quantidade = parseInt(args[0]);
 
-    const args = message.content.split(" ");
-    const quantidade = parseInt(args[1]);
+    if (!quantidade || quantidade < 1 || quantidade > 100)
+      return message.reply("Escolha um número de 1 a 100.");
 
-    if (!quantidade || quantidade < 1 || quantidade > 100) {
-      return message.reply("Digite um número entre 1 e 100.");
-    }
+    await message.channel.bulkDelete(quantidade, true);
 
-    await message.channel.bulkDelete(quantidade + 1, true);
-
-    const aviso = await message.channel.send(`🗑️ ${quantidade} mensagens apagadas!`);
-
-    setTimeout(() => aviso.delete().catch(() => {}), 5000);
-    return;
+    message.channel.send(`🗑 ${quantidade} mensagens apagadas!`);
   }
 
-  // Pedido de teste
-  if (message.content === "?teste") {
+  if (cmd === "teste") {
 
     const canal = await message.guild.channels.create({
       name: `teste-${message.author.username}`,
       type: ChannelType.GuildText,
-      parent: TICKET_CATEGORY_ID,
-
+      parent: TICKETS_CATEGORY_ID,
       permissionOverwrites: [
         {
-          id: message.guild.roles.everyone.id,
-          deny: [PermissionsBitField.Flags.ViewChannel],
+          id: message.guild.id,
+          deny: ["ViewChannel"]
         },
         {
           id: message.author.id,
-          allow: [
-            PermissionsBitField.Flags.ViewChannel,
-            PermissionsBitField.Flags.SendMessages,
-            PermissionsBitField.Flags.ReadMessageHistory,
-          ],
+          allow: ["ViewChannel", "SendMessages"]
         },
         {
           id: MOD_ROLE_ID,
-          allow: [
-            PermissionsBitField.Flags.ViewChannel,
-            PermissionsBitField.Flags.SendMessages,
-            PermissionsBitField.Flags.ReadMessageHistory,
-          ],
-        },
-        {
-          id: client.user.id,
-          allow: [PermissionsBitField.Flags.Administrator],
-        },
-      ],
+          allow: ["ViewChannel", "SendMessages"]
+        }
+      ]
     });
 
-    await canal.send(`
-<@&${MOD_ROLE_ID}>
+    canal.send({
+      content: `<@&${MOD_ROLE_ID}>`,
+      embeds: [
+        new EmbedBuilder()
+          .setTitle("📝 Pedido de teste")
+          .setDescription(`${message.author} abriu um pedido de teste.\n\nAguarde um moderador.`)
+      ]
+    });
 
-🎮 **Pedido de Teste**
-
-Olá ${message.author}!
-
-Seu ticket foi criado com sucesso.
-
-📌 Explique qual teste deseja realizar.
-
-Um moderador responderá em breve.
-`);
-
-    return message.reply(`✅ Seu ticket foi criado: ${canal}`);
+    message.reply(`✅ Ticket criado: ${canal}`);
   }
 
 });
 
-client.login(1528604729645731870);
+client.login(process.env.TOKEN);
