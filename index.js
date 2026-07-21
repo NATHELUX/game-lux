@@ -15,12 +15,10 @@ client.once("ready", () => {
 client.on("messageCreate", (message) => {
   if (message.author.bot) return;
 
-  // ?ping
   if (message.content === "!ping" || message.content === "?ping") {
     return message.reply("🏓 Pong!");
   }
 
-  // ?ajuda
   if (message.content === "?ajuda") {
     return message.reply(`
 📜 **Comandos do Game-lux**
@@ -30,19 +28,19 @@ client.on("messageCreate", (message) => {
 👋 ?oi - O bot cumprimenta você.
 ℹ️ ?server - Mostra informações do servidor.
 👤 ?userinfo - Mostra informações do usuário.
+🖼️ ?avatar - Mostra seu avatar.
 
 🚧 Em breve:
-🖼️ ?avatar
 🗑️ ?clear
+🎲 ?dado
+🪙 ?caraoucoroa
     `);
   }
 
-  // ?oi
   if (message.content === "?oi") {
     return message.reply(`👋 Olá, ${message.author.username}! Seja bem-vindo!`);
   }
 
-  // ?server
   if (message.content === "?server") {
     return message.reply(`
 ℹ️ **Informações do servidor**
@@ -55,7 +53,6 @@ client.on("messageCreate", (message) => {
     `);
   }
 
-  // ?userinfo
   if (message.content === "?userinfo") {
     return message.reply(`
 👤 **Informações do usuário**
@@ -66,6 +63,13 @@ client.on("messageCreate", (message) => {
 🎭 Cargo mais alto: ${message.member.roles.highest.name}
 📆 Entrou no servidor em: ${message.member.joinedAt.toLocaleDateString("pt-BR")}
     `);
+  }
+
+  if (message.content === "?avatar") {
+    return message.reply({
+      content: `🖼️ Avatar de ${message.author.username}`,
+      files: [message.author.displayAvatarURL({ size: 1024 })]
+    });
   }
 });
 
