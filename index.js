@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits } = require("discord.js");
+const { Client, GatewayIntentBits, PermissionsBitField } = require("discord.js");
 
 const client = new Client({
   intents: [
@@ -16,7 +16,7 @@ client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
   // Ping
-  if (message.content === "!ping" || message.content === "?ping") {
+  if (message.content === "?ping" || message.content === "!ping") {
     return message.reply("🏓 Pong!");
   }
 
@@ -28,12 +28,12 @@ client.on("messageCreate", async (message) => {
 🏓 ?ping - Verifica se o bot está online.
 📖 ?ajuda - Mostra esta lista de comandos.
 👋 ?oi - O bot cumprimenta você.
-🌐 ?server - Mostra informações do servidor.
-👤 ?userinfo - Mostra informações do usuário.
-🖼️ ?avatar - Mostra seu avatar.
-🎲 ?dado - Rola um dado de 6 lados.
+🌐 ?server - Informações do servidor.
+👤 ?userinfo - Informações do usuário.
+🖼️ ?avatar - Mostra o avatar.
+🎲 ?dado - Rola um dado.
 🤖 ?botinfo - Informações do bot.
-🗑️ ?clear - Apaga mensagens.
+🗑️ ?clear <quantidade> - Apaga mensagens.
     `);
   }
 
@@ -64,4 +64,61 @@ client.on("messageCreate", async (message) => {
 🆔 ID: ${message.author.id}
 📅 Conta criada em: ${message.author.createdAt.toLocaleDateString("pt-BR")}
 🎭 Cargo mais alto: ${message.member.roles.highest.name}
-📅 Entrou no servidor em: ${message.member.joinedAt.toLocaleDateString("
+📅 Entrou no servidor em: ${message.member.joinedAt.toLocaleDateString("pt-BR")}
+    `);
+  }
+
+  // Avatar
+  if (message.content === "?avatar") {
+    return message.reply({
+      content: `🖼️ Avatar de ${message.author.username}`,
+      files: [message.author.displayAvatarURL({ size: 1024 })]
+    });
+  }
+
+  // Dado
+  if (message.content === "?dado") {
+    const numero = Math.floor(Math.random() * 6) + 1;
+    return message.reply(`🎲 Você rolou o dado e caiu no número **${numero}**!`);
+  }
+
+  // Botinfo
+  if (message.content === "?botinfo") {
+    return message.reply(`
+🤖 **Informações do Game-lux**
+
+📛 Nome: ${client.user.username}
+🆔 ID: ${client.user.id}
+🏠 Servidores: ${client.guilds.cache.size}
+👥 Usuários: ${client.users.cache.size}
+⚡ Discord.js: v14
+🟢 Status: Online
+    `);
+  }
+
+  // Clear
+  if (message.content.startsWith("?clear")) {
+
+    if (!message.member.permissions.has(PermissionsBitField.Flags.ManageMessages)) {
+      return message.reply("❌ Você não tem permissão para apagar mensagens.");
+    }
+
+    const args = message.content.split(" ");
+    const quantidade = parseInt(args[1]);
+
+    if (!quantidade || quantidade < 1 || quantidade > 100) {
+      return message.reply("⚠️ Use: `?clear 10` (1 a 100).");
+    }
+
+    await message.channel.bulkDelete(quantidade, true);
+
+    const msg = await message.channel.send(`🗑️ ${quantidade} mensagens apagadas!`);
+
+    setTimeout(() => {
+      msg.delete().catch(() => {});
+    }, 5000);
+  }
+
+});
+
+client.login(process.env.TOKEN);
