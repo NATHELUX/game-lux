@@ -1,7 +1,11 @@
 const { Client, GatewayIntentBits } = require("discord.js");
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent
+  ]
 });
 
 client.once("ready", () => {
@@ -18,11 +22,9 @@ client.on("messageCreate", (message) => {
   if (message.content === "?ping") {
     message.reply("🏓 Pong!");
   }
-});
 
-client.login(process.env.TOKEN);
-if (message.content === "?ajuda") {
-  message.reply(`
+  if (message.content === "?ajuda") {
+    message.reply(`
 📜 **Comandos do Game-lux**
 
 🏓 ?ping - Verifica se o bot está online.
@@ -33,5 +35,8 @@ if (message.content === "?ajuda") {
 🖼️ ?avatar
 🗑️ ?clear
 ℹ️ ?server
-  `);
-}
+    `);
+  }
+});
+
+client.login(process.env.TOKEN);
