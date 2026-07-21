@@ -15,10 +15,12 @@ client.once("ready", () => {
 client.on("messageCreate", (message) => {
   if (message.author.bot) return;
 
+  // ?ping
   if (message.content === "!ping" || message.content === "?ping") {
     return message.reply("🏓 Pong!");
   }
 
+  // ?ajuda
   if (message.content === "?ajuda") {
     return message.reply(`
 📜 **Comandos do Game-lux**
@@ -29,18 +31,20 @@ client.on("messageCreate", (message) => {
 ℹ️ ?server - Mostra informações do servidor.
 👤 ?userinfo - Mostra informações do usuário.
 🖼️ ?avatar - Mostra seu avatar.
+🎲 ?dado - Rola um dado de 6 lados.
 
 🚧 Em breve:
-🗑️ ?clear
-🎲 ?dado
 🪙 ?caraoucoroa
+🗑️ ?clear
     `);
   }
 
+  // ?oi
   if (message.content === "?oi") {
     return message.reply(`👋 Olá, ${message.author.username}! Seja bem-vindo!`);
   }
 
+  // ?server
   if (message.content === "?server") {
     return message.reply(`
 ℹ️ **Informações do servidor**
@@ -53,6 +57,7 @@ client.on("messageCreate", (message) => {
     `);
   }
 
+  // ?userinfo
   if (message.content === "?userinfo") {
     return message.reply(`
 👤 **Informações do usuário**
@@ -65,11 +70,19 @@ client.on("messageCreate", (message) => {
     `);
   }
 
+  // ?avatar
   if (message.content === "?avatar") {
     return message.reply({
       content: `🖼️ Avatar de ${message.author.username}`,
       files: [message.author.displayAvatarURL({ size: 1024 })]
     });
+  }
+
+  // ?dado
+  if (message.content === "?dado") {
+    const numero = Math.floor(Math.random() * 6) + 1;
+
+    return message.reply(`🎲 Você rolou o dado e caiu no número **${numero}**!`);
   }
 });
 
